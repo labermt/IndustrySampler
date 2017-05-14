@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+// TODO: Is this used? If not, delete it.
+
+// TODO: Layout isn't working, for example if the segment has: android:layout_margin="10dp"
+
+-->
+
+<resources>
+    // TODO: Use this to round the corners or remove it.
+    <dimen name="stack_light_segment_corner_radius">10dp</dimen>
+    <dimen name="stack_light_segment_lens_padding">0dp</dimen>
+
+</resources>

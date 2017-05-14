@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:ordering="sequentially"
+    >
+
+<!--
+TODO: Is there an easier way to deal with objectAnimator durations?
+    see: StackLightSegment.java BLINK_XML_OBJECT_ANIMATOR_COUNT
+-->
+
+<!--Turn off light and then on.-->
+    <objectAnimator
+        android:interpolator="@android:anim/accelerate_interpolator"
+        android:propertyName="blinkPercent_"
+        android:valueFrom="0"
+        android:valueTo="100"
+        android:valueType="intType" />
+
+<!--Keep light on for as long as it took to turn on.-->
+    <objectAnimator
+        android:valueTo="100" />
+
+</set>

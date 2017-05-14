@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+./src/main/res/values/attrs.xml
+
+TODO: How to define attr scoped in both the StackLight and StackLight.Segment?
+
+This was one recommendation I couldn't get to work
+    <declare-styleable name="StackLight$Segment" parent="@declare-styleable/StackLight">
+    </declare-styleable>
+
+TODO: Can segment_blink_millisec be simplified to blink_millisec?
+TODO: Can segment_color be simplified to color?
+TODO: Change segment_state_off to light_off and segment_state_on to light_on
+
+-->
+
+<resources>
+
+    <declare-styleable name="StackLight">
+        <attr name="radius" format="dimension" />
+        <attr name="topLeftRadius" format="dimension" />
+        <attr name="topRightRadius" format="dimension" />
+        <attr name="bottomLeftRadius" format="dimension" />
+        <attr name="bottomRightRadius" format="dimension" />
+        <attr name="segment_blink_duration" format="integer" />
+        <attr name="segment_color" format="color" />
+        <attr name="orientation" format="enum">
+            <enum name="horizontal" value="0" />
+            <enum name="vertical" value="1" />
+        </attr>
+    </declare-styleable>
+
+    <declare-styleable name="StackLightSegmentState">
+        <attr name="segment_state_off" format="boolean" />
+        <attr name="segment_state_on" format="boolean" />
+    </declare-styleable>
+
+</resources>
