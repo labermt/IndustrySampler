@@ -105,9 +105,11 @@ public class StackLight extends LinearLayout {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 
-        // TODO: Code here
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec); // TODO: ??? Keep or delete?
 
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        // setMeasuredDimension(width, height); // TODO: Keep or delete.
+
+        // super.onMeasure(widthMeasureSpec, heightMeasureSpec); // TODO: Or this at the end?
     }
 
     @Override // TODO: Keep or delete?

@@ -16,13 +16,19 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
+import android.support.annotation.IntDef;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.util.AttributeSet;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import static android.graphics.Color.argb;
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 /**
  * Created by bessermt on 4/6/17.
@@ -65,7 +71,7 @@ public class Segment extends AppCompatImageView { // TODO: Change to AppCompatIm
             RADIUS_DEFAULT, RADIUS_DEFAULT  // (bottomLeftRadius.x, bottomLeftRadius.y)
     };
 
-    private Rect rect_ = null; // TODO: This may be dead. Check to be sure, then delete iff it is.
+    private Rect rect_ = null;
 
     private GradientDrawable whiteRectangle_ = new GradientDrawable();
     private GradientDrawable blackRectangle_ = new GradientDrawable();
@@ -172,10 +178,7 @@ public class Segment extends AppCompatImageView { // TODO: Change to AppCompatIm
 
         final LayerDrawable segmentDrawable = new LayerDrawable(layers);
 
-        //setBackgroundResource(getResources().getColor(R.color.b‌​lue));
-        // setBackgroundResource(0); // TODO: ???
         setBackground(segmentDrawable);
-        // TODO: Delete. setBackgroundDrawable(segmentDrawable);// TODO: Delete. Obsolete.
 
         blinkAnimatorSet_ = (AnimatorSet) AnimatorInflater.loadAnimator(context, R.animator.blink);
 
@@ -186,14 +189,8 @@ public class Segment extends AppCompatImageView { // TODO: Change to AppCompatIm
         }
         setBlinkDuration(blinkDuration);
 
-        // TODO: default if not specified? LayoutParams.WRAP_CONTENT
-        // TODO: default if not specified? LayoutParams.MATCH_PARENT
-
-
-        refreshDrawableState(); // TODO: Is this really needed since custom states are not currenty used?
+        refreshDrawableState();
     }
-
-// TODO: Move StackLight defintions into StackLight namespace, for example StackLightSegment would become StackLight.SegmentView
 
     @Override
     public int[] onCreateDrawableState(int extraSpace) {
@@ -220,6 +217,38 @@ public class Segment extends AppCompatImageView { // TODO: Change to AppCompatIm
     @Override
     public void onWindowFocusChanged(boolean hasWindowFocus) {
         super.onWindowFocusChanged(hasWindowFocus);
+
+        final ViewGroup.LayoutParams groupLayoutParams = getLayoutParams();
+        if (groupLayoutParams != null) {
+            LinearLayout.LayoutParams layoutParams = null;
+            int weight = 0;
+            int width = groupLayoutParams.width;
+            int height = groupLayoutParams.height;
+            final @LinearLayoutCompat.OrientationMode int orientation = stackLight_.getOrientation();
+            switch (orientation) {
+                case LinearLayout.HORIZONTAL:
+                    if (width == WRAP_CONTENT) {
+                        width = 0;
+                        weight = 1;
+                        layoutParams = new LinearLayout.LayoutParams(width, height, weight);
+                    }
+                    break;
+
+                case LinearLayout.VERTICAL:
+                    if (height == WRAP_CONTENT) {
+                        height = 0;
+                        weight = 1;
+                        layoutParams = new LinearLayout.LayoutParams(width, height, weight);
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+            if (layoutParams != null) {
+                setLayoutParams(layoutParams);
+            }
+        }
 
         // TODO: ??? Or would a custom button state work
         // http://stackoverflow.com/questions/4336060/how-to-add-a-custom-button-state
@@ -360,14 +389,14 @@ public class Segment extends AppCompatImageView { // TODO: Change to AppCompatIm
         colorRectangle_.setCornerRadii(radii);
     }
 
-    // TODO: private?
-    public int getBlinkPercent_() { // TODO: I don't think this is called. Dead code?  See: https://developer.android.com/reference/android/animation/ObjectAnimator.html
+    // See res/animator/blink.xml android:propertyName="blinkPercent_"
+    private int getBlinkPercent_() {
         return blinkPercent_;
     }
 
-    public void setBlinkPercent_(int blinkPercent) { // TODO: Document the connection between this and blink.xml,  // TODO: private?
+    private void setBlinkPercent_(int blinkPercent) {
         blinkPercent_ = blinkPercent;
-        invalidate(); // TODO: ???? https://developer.android.com/guide/topics/graphics/prop-animation.html#listeners
+        invalidate();
     }
 
     @Override
@@ -428,12 +457,22 @@ public class Segment extends AppCompatImageView { // TODO: Change to AppCompatIm
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 
-        final int siblingCount = stackLight_.getChildCount();
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec); // TODO: ??? Keep or delete?
 
-        final @LinearLayoutCompat.OrientationMode int orientation = stackLight_.getOrientation();
+        // TODO: ??? Keep or delete?
+        final int widthPadded = getMeasuredWidth(); // TODO: Suspicious, since not yet measured.
+        final int heightPadded = getMeasuredHeight(); // TODO: Suspicious, since not yet measured.
+        final int paddingLeft = getPaddingLeft();
+        final int paddingTop = getPaddingTop();
+        final int paddingRight = getPaddingRight();
+        final int paddingBottom = getPaddingBottom();
 
         int parentAvailableWidth = stackLight_.getWidth();
         int parentAvailableHeight = stackLight_.getHeight();
+
+        final int siblingCount = stackLight_.getChildCount(); // TODO: Is this required? Perhaps just getting the width and height makes more sense.
+
+        final @LinearLayoutCompat.OrientationMode int orientation = stackLight_.getOrientation();
 
         if (orientation == LinearLayout.HORIZONTAL) {
             parentAvailableWidth = parentAvailableWidth/siblingCount;
@@ -489,6 +528,7 @@ public class Segment extends AppCompatImageView { // TODO: Change to AppCompatIm
         // Handle Layout Events
         // Also See: https://developer.android.com/guide/topics/ui/how-android-draws.html
 
+        /// TODO: ???? This seems wrong... do some research on what is correct.
         final int leftPad = getPaddingLeft(); //???// TODO: Maybe the pad values should be 0?
         final int topPad = getPaddingTop();
         final int rightPad = getPaddingRight();

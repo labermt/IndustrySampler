@@ -31,7 +31,7 @@ TODO: Change segment_state_off to light_off and segment_state_on to light_on
         </attr>
     </declare-styleable>
 
-    <declare-styleable name="StackLightSegmentState">
+    <declare-styleable name="StackLightSegment">
         <attr name="segment_state_off" format="boolean" />
         <attr name="segment_state_on" format="boolean" />
     </declare-styleable>

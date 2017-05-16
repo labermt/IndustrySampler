@@ -12,6 +12,7 @@
         android:id="@+id/stack_light"
         android:layout_width="100dp"
         android:layout_height="match_parent"
+        android:padding="30dp"
         android:background="@drawable/stack_light">
 
         <com.kea.industry.stacklight.Segment
@@ -44,9 +45,7 @@
             android:id="@+id/stack_light_segment_blue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            stacklight:segment_color="@color/blue"
-            stacklight:segment_state_off="false"
-            stacklight:segment_state_on="false" />
+            stacklight:segment_color="@color/blue" />
 
         <com.kea.industry.stacklight.Segment
             android:id="@+id/stack_light_segment_white"
