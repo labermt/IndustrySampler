@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-// TODO: Is this used? If not, delete it.
-
+// TODO: Is this used in total? If not, delete it.
+// TODO: Are each of these used? If not delete it.
 // TODO: Layout isn't working, for example if the segment has: android:layout_margin="10dp"
 
 -->

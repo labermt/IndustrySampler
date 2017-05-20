@@ -1,7 +1,7 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
-    <dimen name="stack_light_stroke_width">1dp</dimen>
-    <dimen name="stack_light_corner_radius">0dp</dimen>
-    <dimen name="stack_light_segment_corner_radius">0dp</dimen>
-    <dimen name="stack_light_segment_padding">3dp</dimen>
+    <dimen name="stack_light_padding">3dp</dimen>
+    <dimen name="stack_light_stroke_width">2dp</dimen>
+    <dimen name="stack_light_corner_radius">20dp</dimen>
+    <dimen name="stack_light_segment_corner_radius">20dp</dimen>
 </resources>

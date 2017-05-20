@@ -19,15 +19,14 @@ import android.support.annotation.ColorRes;
 import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.util.AttributeSet;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import static android.graphics.Color.argb;
-import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 /**
@@ -36,7 +35,7 @@ import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 // TODO: http://stackoverflow.com/questions/4336060/how-to-add-a-custom-button-state
 
-public class Segment extends AppCompatImageView { // TODO: Change to AppCompatImageButton but without unwanted gaps.
+public class Segment extends AppCompatImageView { // TODO: Change AppCompatImageView to AppCompatImageButton but without unwanted gaps.
 
     private static final int[] STATE_OFF = {R.attr.segment_state_off};
     private static final int[] STATE_ON = {R.attr.segment_state_on};
@@ -54,9 +53,6 @@ public class Segment extends AppCompatImageView { // TODO: Change to AppCompatIm
     private Context context_ = null;
     private final Handler handler_ = new Handler(Looper.getMainLooper());
     private StackLight stackLight_ = null;
-
-    private AnimatorSet blinkAnimatorSet_ = null;
-    private int blinkPercent_ = 0;
 
     private @ColorInt int color_ = COLOR_BLACK;
     private boolean off_ = OFF_DEFAULT;
@@ -77,6 +73,34 @@ public class Segment extends AppCompatImageView { // TODO: Change to AppCompatIm
     private GradientDrawable blackRectangle_ = new GradientDrawable();
     private GradientDrawable colorRectangle_ = new GradientDrawable();
 
+    private AnimatorSet blinkAnimatorSet_ = null;
+    private int blinkPercent_ = 0;
+
+    private final AnimatorListenerAdapter animatorListenerAdapter_ = new AnimatorListenerAdapter() {
+        private boolean canceled_;
+
+        @Override
+        public void onAnimationStart(Animator animation) {
+            canceled_ = false;
+        }
+
+        @Override
+        public void onAnimationCancel(Animator animation) {
+            canceled_ = true;
+        }
+
+        @Override
+        public void onAnimationEnd(Animator animation) {
+            if (!canceled_) {
+                handler_.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        blinkAnimatorSet_.start();
+                    }
+                });
+            }
+        }
+    };
 
     public Segment(Context context) {
         super(context);
@@ -157,6 +181,16 @@ public class Segment extends AppCompatImageView { // TODO: Change to AppCompatIm
         context_ = context;
 
         // TODO: try/catch
+        blinkAnimatorSet_ = (AnimatorSet) AnimatorInflater.loadAnimator(context, R.animator.blink);
+
+        final boolean blinkDurationUseParent = isBlinkDurationUseParent(blinkDuration);
+        setBlinkDurationUseParent(blinkDurationUseParent);
+        if (blinkDurationUseParent) {
+            blinkDuration = StackLight.BLINK_DURATION_DEFAULT;
+        }
+        setBlinkDuration(blinkDuration);
+        blinkAnimatorSet_.addListener(animatorListenerAdapter_);
+        blinkAnimatorSet_.setTarget(this);
 
         whiteRectangle_.setShape(GradientDrawable.RECTANGLE);
         whiteRectangle_.setColor(Color.WHITE);
@@ -180,16 +214,10 @@ public class Segment extends AppCompatImageView { // TODO: Change to AppCompatIm
 
         setBackground(segmentDrawable);
 
-        blinkAnimatorSet_ = (AnimatorSet) AnimatorInflater.loadAnimator(context, R.animator.blink);
-
-        final boolean blinkDurationUseParent = isBlinkDurationUseParent(blinkDuration);
-        setBlinkDurationUseParent(blinkDurationUseParent);
-        if (blinkDurationUseParent) {
-            blinkDuration = StackLight.BLINK_DURATION_DEFAULT;
-        }
-        setBlinkDuration(blinkDuration);
-
         refreshDrawableState();
+
+        // TODO: Mutate or not todo mutate?
+        // whiteRectangle_.mutate();
     }
 
     @Override
@@ -212,6 +240,20 @@ public class Segment extends AppCompatImageView { // TODO: Change to AppCompatIm
         }
 
         return drawableState;
+    }
+
+    private void updateAnimation() {
+        // TODO: ??? Or would a custom button state work
+        // http://stackoverflow.com/questions/4336060/how-to-add-a-custom-button-state
+        // https://developer.android.com/guide/topics/graphics/drawable-animation.html
+        final boolean blink = getBlink();
+        if (blinkAnimatorSet_ != null) {
+            if (blink) {
+                blinkAnimatorSet_.start();
+            } else {
+                blinkAnimatorSet_.end();
+            }
+        }
     }
 
     @Override
@@ -249,41 +291,7 @@ public class Segment extends AppCompatImageView { // TODO: Change to AppCompatIm
                 setLayoutParams(layoutParams);
             }
         }
-
-        // TODO: ??? Or would a custom button state work
-        // http://stackoverflow.com/questions/4336060/how-to-add-a-custom-button-state
-        // https://developer.android.com/guide/topics/graphics/drawable-animation.html
-        if (on_ && off_) {
-            blinkAnimatorSet_.setTarget(this);
-
-            blinkAnimatorSet_.addListener(new AnimatorListenerAdapter() {
-                private boolean canceled_;
-
-                @Override
-                public void onAnimationStart(Animator animation) {
-                    canceled_ = false;
-                }
-
-                @Override
-                public void onAnimationCancel(Animator animation) {
-                    canceled_ = true;
-                }
-
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    if (!canceled_) {
-                        handler_.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                blinkAnimatorSet_.start();
-                            }
-                        });
-                    }
-                }
-            });
-
-            blinkAnimatorSet_.start();
-        }
+        updateAnimation();
     }
 
     public @ColorInt int getColor() {
@@ -313,15 +321,16 @@ public class Segment extends AppCompatImageView { // TODO: Change to AppCompatIm
         return result;
     }
 
-    public boolean getBlink() {
-        final boolean result = off_ && on_;
-        return result;
-    }
-
     public void setOnOff(final boolean on) {
         off_ = !on;
         on_ = on;
         refreshDrawableState();
+        invalidate();
+    }
+
+    public boolean getBlink() {
+        final boolean result = off_ && on_;
+        return result;
     }
 
     public void setBlink(final boolean blink) {
@@ -331,7 +340,9 @@ public class Segment extends AppCompatImageView { // TODO: Change to AppCompatIm
         } else if (off_ == true && on_ == true) {
             on_ = false;
         }
-        refreshDrawableState();
+        refreshDrawableState(); // TODO: Do the refreshDrawableState() calls do anything?
+        // invalidate(); // TODO: Does it help to invalidate()?
+        updateAnimation();
     }
 
     public long getBlinkDuration() {
@@ -459,13 +470,8 @@ public class Segment extends AppCompatImageView { // TODO: Change to AppCompatIm
 
         super.onMeasure(widthMeasureSpec, heightMeasureSpec); // TODO: ??? Keep or delete?
 
-        // TODO: ??? Keep or delete?
-        final int widthPadded = getMeasuredWidth(); // TODO: Suspicious, since not yet measured.
-        final int heightPadded = getMeasuredHeight(); // TODO: Suspicious, since not yet measured.
-        final int paddingLeft = getPaddingLeft();
-        final int paddingTop = getPaddingTop();
-        final int paddingRight = getPaddingRight();
-        final int paddingBottom = getPaddingBottom();
+        // TODO: Are all these calculations for sibling count required now that the parent is
+        // responsible for the layout?
 
         int parentAvailableWidth = stackLight_.getWidth();
         int parentAvailableHeight = stackLight_.getHeight();

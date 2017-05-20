@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!--
+TODO: Use dimens.xml to parameterize values.
+-->
+
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:stacklight="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -11,9 +17,15 @@
     <com.kea.industry.stacklight.StackLight
         android:id="@+id/stack_light"
         android:layout_width="100dp"
-        android:layout_height="match_parent"
-        android:padding="30dp"
-        android:background="@drawable/stack_light">
+        android:layout_height="0dp"
+        android:padding="5dp"
+        android:background="@drawable/stack_light"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginStart="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent">
 
         <com.kea.industry.stacklight.Segment
             android:id="@+id/stack_light_segment_red"
@@ -22,15 +34,15 @@
             stacklight:topLeftRadius="@dimen/stack_light_segment_corner_radius"
             stacklight:topRightRadius="@dimen/stack_light_segment_corner_radius"
             stacklight:segment_color="@color/red"
-            stacklight:segment_state_off="true"
-            stacklight:segment_state_on="true" />
+            stacklight:segment_state_off="false"
+            stacklight:segment_state_on="false" />
 
         <com.kea.industry.stacklight.Segment
             android:id="@+id/stack_light_segment_amber"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             stacklight:segment_color="@color/amber"
-            stacklight:segment_state_off="true"
+            stacklight:segment_state_off="false"
             stacklight:segment_state_on="false" />
 
         <com.kea.industry.stacklight.Segment
@@ -39,22 +51,55 @@
             android:layout_height="wrap_content"
             stacklight:segment_color="@color/green"
             stacklight:segment_state_off="false"
-            stacklight:segment_state_on="true" />
+            stacklight:segment_state_on="false" />
 
         <com.kea.industry.stacklight.Segment
             android:id="@+id/stack_light_segment_blue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            stacklight:segment_color="@color/blue" />
+            stacklight:segment_color="@color/blue"
+            stacklight:segment_state_off="false"
+            stacklight:segment_state_on="false" />
 
         <com.kea.industry.stacklight.Segment
             android:id="@+id/stack_light_segment_white"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             stacklight:segment_color="@color/silver"
-            stacklight:segment_state_off="true"
-            stacklight:segment_state_on="true" />
+            stacklight:segment_state_off="false"
+            stacklight:segment_state_on="false" />
 
     </com.kea.industry.stacklight.StackLight>
+
+    <RadioGroup
+        android:id="@+id/radioGroupSegmentState"
+        android:orientation="vertical"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/stack_light"
+        app:layout_constraintTop_toTopOf="@+id/stack_light" >
+
+        <RadioButton
+            android:id="@+id/radioButtonOff"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Off" />
+
+        <RadioButton
+            android:id="@+id/radioButtonOn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="On" />
+
+        <RadioButton
+            android:id="@+id/radioButtonBlink"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Blink" />
+
+    </RadioGroup>
 
 </android.support.constraint.ConstraintLayout>
