@@ -40,7 +40,7 @@ public class Segment extends AppCompatImageView { // TODO: Change AppCompatImage
     private static final int[] STATE_OFF = {R.attr.segment_state_off};
     private static final int[] STATE_ON = {R.attr.segment_state_on};
 
-    private static final int BLINK_XML_OBJECT_ANIMATOR_COUNT = 2; // Currently 2 blink.xml objectAnimators.
+    private static final int BLINK_XML_OBJECT_ANIMATOR_SPLIT = 2; // Half duration, half startOffset.
 
     private static @ColorInt int COLOR_BLACK = argb(0xFF, 0x00, 0x00, 0x00);
 
@@ -95,6 +95,7 @@ public class Segment extends AppCompatImageView { // TODO: Change AppCompatImage
                 handler_.post(new Runnable() {
                     @Override
                     public void run() {
+                        //  TODO: DELETE? blinkAnimatorSet_.setStartDelay(???);
                         blinkAnimatorSet_.start();
                     }
                 });
@@ -246,8 +247,8 @@ public class Segment extends AppCompatImageView { // TODO: Change AppCompatImage
         // TODO: ??? Or would a custom button state work
         // http://stackoverflow.com/questions/4336060/how-to-add-a-custom-button-state
         // https://developer.android.com/guide/topics/graphics/drawable-animation.html
-        final boolean blink = getBlink();
         if (blinkAnimatorSet_ != null) {
+            final boolean blink = getBlink();
             if (blink) {
                 blinkAnimatorSet_.start();
             } else {
@@ -346,7 +347,7 @@ public class Segment extends AppCompatImageView { // TODO: Change AppCompatImage
     }
 
     public long getBlinkDuration() {
-        final long result = blinkAnimatorSet_.getDuration() * BLINK_XML_OBJECT_ANIMATOR_COUNT;
+        final long result = blinkAnimatorSet_.getDuration() * BLINK_XML_OBJECT_ANIMATOR_SPLIT;
         return result;
     }
 
@@ -361,7 +362,8 @@ public class Segment extends AppCompatImageView { // TODO: Change AppCompatImage
             blinkDurationValue = stackLight_.getBlinkDuration();
         }
 
-        blinkAnimatorSet_.setDuration(blinkDurationValue / BLINK_XML_OBJECT_ANIMATOR_COUNT);
+        blinkAnimatorSet_.setDuration(blinkDurationValue / BLINK_XML_OBJECT_ANIMATOR_SPLIT);
+        blinkAnimatorSet_.setStartDelay(blinkDurationValue / BLINK_XML_OBJECT_ANIMATOR_SPLIT);
         // TODO: invalidate()? blinkAnimatorSet_.cancel(),  blinkAnimatorSet_.start(),... or something else?
     }
 
