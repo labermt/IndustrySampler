@@ -40,7 +40,7 @@ public class Segment extends AppCompatImageView { // TODO: Change AppCompatImage
     private static final int[] STATE_OFF = {R.attr.segment_state_off};
     private static final int[] STATE_ON = {R.attr.segment_state_on};
 
-    private static final int BLINK_XML_OBJECT_ANIMATOR_SPLIT = 2; // Half duration, half startOffset.
+    private static final int BLINK_XML_OBJECT_ANIMATOR_SPLIT = StackLight.BLINK_XML_OBJECT_ANIMATOR_SPLIT;
 
     private static @ColorInt int COLOR_BLACK = argb(0xFF, 0x00, 0x00, 0x00);
 
@@ -51,7 +51,6 @@ public class Segment extends AppCompatImageView { // TODO: Change AppCompatImage
     private static final int RADIUS_DEFAULT = 0;
 
     private Context context_ = null;
-    private final Handler handler_ = new Handler(Looper.getMainLooper());
     private StackLight stackLight_ = null;
 
     private @ColorInt int color_ = COLOR_BLACK;
@@ -77,6 +76,7 @@ public class Segment extends AppCompatImageView { // TODO: Change AppCompatImage
     private int blinkPercent_ = 0;
 
     private final AnimatorListenerAdapter animatorListenerAdapter_ = new AnimatorListenerAdapter() {
+        private final Handler handler_ = new Handler(Looper.getMainLooper());
         private boolean canceled_;
 
         @Override
@@ -91,7 +91,7 @@ public class Segment extends AppCompatImageView { // TODO: Change AppCompatImage
 
         @Override
         public void onAnimationEnd(Animator animation) {
-            if (!canceled_) {
+            if (!canceled_ && handler_!=null) {
                 handler_.post(new Runnable() {
                     @Override
                     public void run() {
@@ -127,7 +127,6 @@ public class Segment extends AppCompatImageView { // TODO: Change AppCompatImage
 */
 
     void init(final Context context, final AttributeSet attrs, final int defStyleAttr, final int defStyleRes) {
-
         @ColorInt int color = COLOR_BLACK;
 
         boolean off = false;
@@ -358,12 +357,19 @@ public class Segment extends AppCompatImageView { // TODO: Change AppCompatImage
 
     public void setBlinkDuration(final long blinkDuration) {
         long blinkDurationValue = blinkDuration;
-        if (stackLight_ != null && isBlinkDurationUseParent(blinkDuration)) {
-            blinkDurationValue = stackLight_.getBlinkDuration();
+        if (stackLight_ != null) {
+            final boolean blinkDurationUseParent = isBlinkDurationUseParent(blinkDuration);
+            if (blinkDurationUseParent) {
+                blinkDurationValue = stackLight_.getBlinkDuration();
+            }
         }
 
-        blinkAnimatorSet_.setDuration(blinkDurationValue / BLINK_XML_OBJECT_ANIMATOR_SPLIT);
-        blinkAnimatorSet_.setStartDelay(blinkDurationValue / BLINK_XML_OBJECT_ANIMATOR_SPLIT);
+        if (blinkDurationValue > 0) {
+            final long blinkDurationHalf = blinkDurationValue / BLINK_XML_OBJECT_ANIMATOR_SPLIT;
+            blinkAnimatorSet_.setDuration(blinkDurationHalf);
+            blinkAnimatorSet_.setStartDelay(blinkDurationHalf);
+        }
+
         // TODO: invalidate()? blinkAnimatorSet_.cancel(),  blinkAnimatorSet_.start(),... or something else?
     }
 
@@ -412,6 +418,19 @@ public class Segment extends AppCompatImageView { // TODO: Change AppCompatImage
         invalidate();
     }
 
+    private int getBlinkPercent() {
+        int result = getBlinkPercent_();
+        final boolean useParent = isBlinkDurationUseParent();
+        if (stackLight_ != null && useParent) {
+            result = stackLight_.getBlinkPercent();
+        }
+        return result;
+    }
+
+    void setBlinkPercent(final int blinkPercent) {
+        setBlinkPercent_(blinkPercent);
+    }
+
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
@@ -444,16 +463,19 @@ public class Segment extends AppCompatImageView { // TODO: Change AppCompatImage
         int whiteTop = 0;
         int whiteRight = 0;
         int whiteBottom = 0;
-        if (off_ && on_) { // blink
-            final int percentOff = 100 - blinkPercent_;
-            final int xDelta = percentOff * (right - left) / 2 / 100;
-            final int yDelta = percentOff * (bottom - top) / 2 / 100;
+
+        final boolean isOn = getOn();
+        final boolean isBlink = getBlink();
+        if (isBlink) { // blink
+            final int blinkPercentOff = 100 - getBlinkPercent();
+            final int xDelta = blinkPercentOff * (right - left) / 2 / 100;
+            final int yDelta = blinkPercentOff * (bottom - top) / 2 / 100;
 
             whiteLeft = innerQuarterLeft + xDelta;
             whiteTop = innerQuarterTop + yDelta;
             whiteRight = innerQuarterRight - xDelta;
             whiteBottom = innerQuarterBottom - yDelta;
-        } else if (on_) { // on
+        } else if (isOn) { // on
             whiteLeft = innerQuarterLeft;
             whiteTop = innerQuarterTop;
             whiteRight = innerQuarterRight;
