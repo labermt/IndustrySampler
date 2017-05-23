@@ -25,7 +25,10 @@ public class StackLight extends LinearLayout {
 
     private static final int COLOR_RESID_DEFAULT = R.color.default_stack_light_color;
     static final int BLINK_DURATION_DEFAULT = 1000; // millisecs
-    static final int BLINK_XML_OBJECT_ANIMATOR_SPLIT = 2; // Half duration, half startOffset.
+
+    // Break animation duration into delay and active time.
+    // ex. 2=half animated, half delay, 3=third animated, 2 thirds delay.
+    static final int BLINK_XML_OBJECT_ANIMATOR_DENOM = 2;
 
     private long blinkDuration_ = BLINK_DURATION_DEFAULT;
 
@@ -52,7 +55,6 @@ public class StackLight extends LinearLayout {
                 handler_.post(new Runnable() {
                     @Override
                     public void run() {
-                        //  TODO: DELETE? blinkAnimatorSet_.setStartDelay(???);
                         blinkAnimatorSet_.start();
                     }
                 });
@@ -70,7 +72,7 @@ public class StackLight extends LinearLayout {
         init(context, attrs, 0, 0);
     }
 
-    public StackLight(Context context, AttributeSet attrs, int defStyleAttr) { // TODO: Decide if this is desired.
+    public StackLight(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context, attrs, defStyleAttr, 0);
     }
@@ -84,9 +86,6 @@ public class StackLight extends LinearLayout {
 */
 
     void init(final Context context, final AttributeSet attrs, final int defStyleAttr, final int defStyleRes) {
-        final int stackColorResId = COLOR_RESID_DEFAULT;
-        int stackColor = ContextCompat.getColor(context, stackColorResId); // TODO: Delete?
-
         @LinearLayoutCompat.OrientationMode int orientation = LinearLayout.VERTICAL;
 
         int blinkDuration = BLINK_DURATION_DEFAULT;
@@ -98,10 +97,7 @@ public class StackLight extends LinearLayout {
 
         try {
             orientation = a.getInt(R.styleable.StackLight_orientation, orientation);
-            blinkDuration = a.getInt(R.styleable.StackLight_segment_blink_duration, blinkDuration);
-
-            // TODO: Delete: final int orientationResId = Resources.getSystem().getIdentifier("LinearLayout_orientation", "attr", "android");
-
+            blinkDuration = a.getInt(R.styleable.StackLight_blink_duration, blinkDuration);
         } finally {
             a.recycle();
         }
@@ -116,27 +112,15 @@ public class StackLight extends LinearLayout {
         blinkAnimatorSet_.setTarget(this);
     }
 
-    private void setStackOrientation(final @LinearLayoutCompat.OrientationMode int orientation) { // TODO: Why not just use parent method instead? Dead code?
+    private void setStackOrientation(final @LinearLayoutCompat.OrientationMode int orientation) {
         setOrientation(orientation);
         // TODO: Can the LinearLayout Orientation be used or will this require custom storage? It is unclear if there is a way to get the current orientation from LinearLayout.
     }
 
     public long getBlinkDuration() {
-        final long result = blinkAnimatorSet_.getDuration() * BLINK_XML_OBJECT_ANIMATOR_SPLIT;
+        final long result = blinkAnimatorSet_.getDuration() * BLINK_XML_OBJECT_ANIMATOR_DENOM;
         return result;
     }
-
-/* TODO: Delete
-    private static void setBlinkDurationChild(final View child, final long blinkDuration) {
-        if (child instanceof Segment) {
-            final Segment segment = (Segment) child;
-            final boolean isBlinkDurationUseParent = segment.isBlinkDurationUseParent();
-            if (isBlinkDurationUseParent) {
-                segment.setBlinkDuration(blinkDuration);
-            }
-        }
-    }
-*/
 
     private static void setBlinkPercentChild(final View child, final int blinkPercent) {
         if (child instanceof Segment) {
@@ -148,29 +132,19 @@ public class StackLight extends LinearLayout {
         }
     }
 
-    public void setBlinkDuration(final long blinkDuration) { // TODO: Check the value is positive and use default if not?
+    public void setBlinkDuration(final long blinkDuration) {
         long blinkDurationValue = blinkDuration;
         if (blinkDuration <=0) {
             blinkDurationValue = BLINK_DURATION_DEFAULT;
         }
         blinkDuration_ = blinkDurationValue;
 
-/* TODO: Delete
-        int n = getChildCount();
-        while (n > 0) {
-            --n;
-            final View child = getChildAt(n);
-            setBlinkDurationChild(child, blinkDurationValue);
-        }
-*/
-
         if (blinkDurationValue > 0) {
-            final long blinkDurationHalf = blinkDurationValue / BLINK_XML_OBJECT_ANIMATOR_SPLIT;
-            blinkAnimatorSet_.setDuration(blinkDurationHalf);
-            blinkAnimatorSet_.setStartDelay(blinkDurationHalf);
+            final long blinkDurationRatio = blinkDurationValue / BLINK_XML_OBJECT_ANIMATOR_DENOM;
+            blinkAnimatorSet_.setDuration(blinkDurationRatio);
+            final long blinkDelayRatio = blinkDurationRatio*(BLINK_XML_OBJECT_ANIMATOR_DENOM-1);
+            blinkAnimatorSet_.setStartDelay(blinkDelayRatio);
         }
-
-        // TODO: invalidate()? blinkAnimatorSet_.cancel(),  blinkAnimatorSet_.start(),... or something else?
     }
 
     // See res/animator/blink.xml android:propertyName="blinkPercent_"
@@ -200,43 +174,4 @@ public class StackLight extends LinearLayout {
 
         blinkAnimatorSet_.start();
     }
-
-// TODO: Delete empty callbacks:
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec); // TODO: ??? Keep or delete?
-
-        // setMeasuredDimension(width, height); // TODO: Keep or delete.
-
-        // super.onMeasure(widthMeasureSpec, heightMeasureSpec); // TODO: Or this at the end?
-    }
-
-    // TODO: Delete all empty callbacks:
-    @Override // TODO: Keep or delete?
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
-
-        // TODO: Test if this code is correct. I'm not sure if this is how to account for padding.
-        // See: https://developer.android.com/training/custom-views/custom-drawing.html#layoutevent
-        // Handle Layout Events
-        // Also See: https://developer.android.com/guide/topics/ui/how-android-draws.html
-
-/*
-        final int leftPad = getPaddingLeft();
-        final int topPad = getPaddingTop();
-        final int rightPad = getPaddingRight();
-        final int bottomPad = getPaddingBottom();
-
-        rect_ = new Rect(leftPad, topPad, w - (leftPad + rightPad), h - (topPad + bottomPad));
-*/
-    }
-
-/*
-    @Override
-    public void onViewAdded(View child) {
-        super.onViewAdded(child);
-        setBlinkDurationChild(child, blinkDuration_);
-    }
-*/
 }

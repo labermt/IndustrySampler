@@ -33,14 +33,17 @@ import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
  * Created by bessermt on 4/6/17.
  */
 
-// TODO: http://stackoverflow.com/questions/4336060/how-to-add-a-custom-button-state
+// Alternate way to implement would have been to use custom button states as follows:
+// http://stackoverflow.com/questions/4336060/how-to-add-a-custom-button-state
 
 public class Segment extends AppCompatImageView { // TODO: Change AppCompatImageView to AppCompatImageButton but without unwanted gaps.
 
-    private static final int[] STATE_OFF = {R.attr.segment_state_off};
-    private static final int[] STATE_ON = {R.attr.segment_state_on};
+/*
+    private static final int[] LIGHT_OFF = {R.attr.light_off};
+    private static final int[] LIGHT_ON = {R.attr.light_on};
+*/
 
-    private static final int BLINK_XML_OBJECT_ANIMATOR_SPLIT = StackLight.BLINK_XML_OBJECT_ANIMATOR_SPLIT;
+    private static final int BLINK_XML_OBJECT_ANIMATOR_DENOM = StackLight.BLINK_XML_OBJECT_ANIMATOR_DENOM;
 
     private static @ColorInt int COLOR_BLACK = argb(0xFF, 0x00, 0x00, 0x00);
 
@@ -95,7 +98,6 @@ public class Segment extends AppCompatImageView { // TODO: Change AppCompatImage
                 handler_.post(new Runnable() {
                     @Override
                     public void run() {
-                        //  TODO: DELETE? blinkAnimatorSet_.setStartDelay(???);
                         blinkAnimatorSet_.start();
                     }
                 });
@@ -147,35 +149,23 @@ public class Segment extends AppCompatImageView { // TODO: Change AppCompatImage
 
         try {
             color = a.getColor(R.styleable.StackLight_segment_color, color);
-            blinkDuration = a.getInteger(R.styleable.StackLight_segment_blink_duration, blinkDuration);
+            blinkDuration = a.getInteger(R.styleable.StackLight_blink_duration, blinkDuration);
             radius = a.getDimensionPixelSize(R.styleable.StackLight_radius, radius);
             topLeftRadius = a.getDimensionPixelSize(R.styleable.StackLight_topLeftRadius, topLeftRadius);
             topRightRadius = a.getDimensionPixelSize(R.styleable.StackLight_topRightRadius, topRightRadius);
             bottomRightRadius = a.getDimensionPixelSize(R.styleable.StackLight_bottomRightRadius, bottomRightRadius);
             bottomLeftRadius = a.getDimensionPixelSize(R.styleable.StackLight_bottomLeftRadius, bottomLeftRadius);
+            off = a.getBoolean(R.styleable.StackLight_light_off, off);
+            on = a.getBoolean(R.styleable.StackLight_light_off, on);
         } finally {
             a.recycle();
         }
 
-        // TODO: Add try block, or maybe move up to above try block.
-        if (attrs != null) {
-            int i = attrs.getAttributeCount();
-            while (i > 0) {
-                --i;
-                final int name = attrs.getAttributeNameResource(i);
-                if (name == R.attr.segment_state_off) {
-                    off = attrs.getAttributeBooleanValue(i, off);
-                } else if (name == R.attr.segment_state_on) {
-                    on = attrs.getAttributeBooleanValue(i, on);
-                }
-            }
-        }
-
         final float[] radii = new float[] {
-                topLeftRadius, topLeftRadius,
-                topRightRadius, topRightRadius,
-                bottomLeftRadius, bottomLeftRadius,
-                bottomRightRadius, bottomRightRadius
+            topLeftRadius, topLeftRadius,
+            topRightRadius, topRightRadius,
+            bottomLeftRadius, bottomLeftRadius,
+            bottomRightRadius, bottomRightRadius
         };
 
         context_ = context;
@@ -213,13 +203,9 @@ public class Segment extends AppCompatImageView { // TODO: Change AppCompatImage
         final LayerDrawable segmentDrawable = new LayerDrawable(layers);
 
         setBackground(segmentDrawable);
-
-        refreshDrawableState();
-
-        // TODO: Mutate or not todo mutate?
-        // whiteRectangle_.mutate();
     }
 
+/* Currently not required, but could be helpful if custom button states are ever used.
     @Override
     public int[] onCreateDrawableState(int extraSpace) {
 
@@ -233,19 +219,17 @@ public class Segment extends AppCompatImageView { // TODO: Change AppCompatImage
         final int[] drawableState = super.onCreateDrawableState(extraSpace);
 
         if (off_) {
-            mergeDrawableStates(drawableState, STATE_OFF);
+            mergeDrawableStates(drawableState, LIGHT_OFF);
         }
         if (on_) {
-            mergeDrawableStates(drawableState, STATE_ON);
+            mergeDrawableStates(drawableState, LIGHT_ON);
         }
 
         return drawableState;
     }
+*/
 
     private void updateAnimation() {
-        // TODO: ??? Or would a custom button state work
-        // http://stackoverflow.com/questions/4336060/how-to-add-a-custom-button-state
-        // https://developer.android.com/guide/topics/graphics/drawable-animation.html
         if (blinkAnimatorSet_ != null) {
             final boolean blink = getBlink();
             if (blink) {
@@ -340,13 +324,11 @@ public class Segment extends AppCompatImageView { // TODO: Change AppCompatImage
         } else if (off_ == true && on_ == true) {
             on_ = false;
         }
-        refreshDrawableState(); // TODO: Do the refreshDrawableState() calls do anything?
-        // invalidate(); // TODO: Does it help to invalidate()?
         updateAnimation();
     }
 
     public long getBlinkDuration() {
-        final long result = blinkAnimatorSet_.getDuration() * BLINK_XML_OBJECT_ANIMATOR_SPLIT;
+        final long result = blinkAnimatorSet_.getDuration() * BLINK_XML_OBJECT_ANIMATOR_DENOM;
         return result;
     }
 
@@ -365,12 +347,11 @@ public class Segment extends AppCompatImageView { // TODO: Change AppCompatImage
         }
 
         if (blinkDurationValue > 0) {
-            final long blinkDurationHalf = blinkDurationValue / BLINK_XML_OBJECT_ANIMATOR_SPLIT;
-            blinkAnimatorSet_.setDuration(blinkDurationHalf);
-            blinkAnimatorSet_.setStartDelay(blinkDurationHalf);
+            final long blinkDurationRatio = blinkDurationValue / BLINK_XML_OBJECT_ANIMATOR_DENOM;
+            blinkAnimatorSet_.setDuration(blinkDurationRatio);
+            final long blinkDelayRatio = blinkDurationRatio*(BLINK_XML_OBJECT_ANIMATOR_DENOM-1);
+            blinkAnimatorSet_.setStartDelay(blinkDelayRatio);
         }
-
-        // TODO: invalidate()? blinkAnimatorSet_.cancel(),  blinkAnimatorSet_.start(),... or something else?
     }
 
     public boolean isBlinkDurationUseParent() {
@@ -466,7 +447,7 @@ public class Segment extends AppCompatImageView { // TODO: Change AppCompatImage
 
         final boolean isOn = getOn();
         final boolean isBlink = getBlink();
-        if (isBlink) { // blink
+        if (isBlink) {
             final int blinkPercentOff = 100 - getBlinkPercent();
             final int xDelta = blinkPercentOff * (right - left) / 2 / 100;
             final int yDelta = blinkPercentOff * (bottom - top) / 2 / 100;
@@ -475,7 +456,7 @@ public class Segment extends AppCompatImageView { // TODO: Change AppCompatImage
             whiteTop = innerQuarterTop + yDelta;
             whiteRight = innerQuarterRight - xDelta;
             whiteBottom = innerQuarterBottom - yDelta;
-        } else if (isOn) { // on
+        } else if (isOn) {
             whiteLeft = innerQuarterLeft;
             whiteTop = innerQuarterTop;
             whiteRight = innerQuarterRight;
@@ -485,14 +466,12 @@ public class Segment extends AppCompatImageView { // TODO: Change AppCompatImage
         }
         whiteRectangle_.setAlpha(alpha);
         whiteRectangle_.setBounds(whiteLeft, whiteTop, whiteRight, whiteBottom);
-
-        // TODO: read https://developer.android.com/guide/topics/graphics/2d-graphics.html
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec); // TODO: ??? Keep or delete?
+        // super.onMeasure(widthMeasureSpec, heightMeasureSpec); // TODO: ??? Keep or delete?
 
         // TODO: Are all these calculations for sibling count required now that the parent is
         // responsible for the layout?
@@ -553,13 +532,7 @@ public class Segment extends AppCompatImageView { // TODO: Change AppCompatImage
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
 
-        // TODO: Test if this code is correct. I'm not sure if this is how to account for padding.
-        // See: https://developer.android.com/training/custom-views/custom-drawing.html#layoutevent
-        // Handle Layout Events
-        // Also See: https://developer.android.com/guide/topics/ui/how-android-draws.html
-
-        /// TODO: ???? This seems wrong... do some research on what is correct.
-        final int leftPad = getPaddingLeft(); //???// TODO: Maybe the pad values should be 0?
+        final int leftPad = getPaddingLeft();
         final int topPad = getPaddingTop();
         final int rightPad = getPaddingRight();
         final int bottomPad = getPaddingBottom();

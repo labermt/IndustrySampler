@@ -34,40 +34,39 @@ TODO: Use dimens.xml to parameterize values.
             stacklight:topLeftRadius="@dimen/stack_light_segment_corner_radius"
             stacklight:topRightRadius="@dimen/stack_light_segment_corner_radius"
             stacklight:segment_color="@color/red"
-            stacklight:segment_state_off="false"
-            stacklight:segment_state_on="false" />
+            stacklight:light_off="true"
+            stacklight:light_on="false"
+            stacklight:blink_duration="300" />
 
         <com.kea.industry.stacklight.Segment
             android:id="@+id/stack_light_segment_amber"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             stacklight:segment_color="@color/amber"
-            stacklight:segment_state_off="false"
-            stacklight:segment_state_on="false" />
+            stacklight:light_off="false"
+            stacklight:light_on="true" />
 
         <com.kea.industry.stacklight.Segment
             android:id="@+id/stack_light_segment_green"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             stacklight:segment_color="@color/green"
-            stacklight:segment_state_off="false"
-            stacklight:segment_state_on="false" />
+            stacklight:light_off="true"
+            stacklight:light_on="true" />
 
         <com.kea.industry.stacklight.Segment
             android:id="@+id/stack_light_segment_blue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            stacklight:segment_color="@color/blue"
-            stacklight:segment_state_off="false"
-            stacklight:segment_state_on="false" />
+            stacklight:segment_color="@color/blue" />
 
         <com.kea.industry.stacklight.Segment
             android:id="@+id/stack_light_segment_white"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             stacklight:segment_color="@color/silver"
-            stacklight:segment_state_off="false"
-            stacklight:segment_state_on="false" />
+            stacklight:light_off="false"
+            stacklight:light_on="false" />
 
     </com.kea.industry.stacklight.StackLight>
 
