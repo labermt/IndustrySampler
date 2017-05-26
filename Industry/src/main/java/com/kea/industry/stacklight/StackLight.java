@@ -8,9 +8,12 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.util.AttributeSet;
+import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -61,6 +64,78 @@ public class StackLight extends LinearLayout {
             }
         }
     };
+
+    private static class SavedState extends BaseSavedState {
+        private SparseArray childrenStates_;
+
+        private static final ClassLoaderCreator<SavedState> CREATOR =
+                new ClassLoaderCreator<SavedState>() {
+                    @Override
+                    public SavedState createFromParcel(Parcel source, ClassLoader loader) {
+                        return new SavedState(source, loader);
+                    }
+
+                    @Override
+                    public SavedState createFromParcel(Parcel source) {
+                        return createFromParcel(null);
+                    }
+
+                    public SavedState[] newArray(int size) {
+                        return new SavedState[size];
+                    }
+                };
+
+        private SavedState(final Parcelable superState) {
+            super(superState);
+        }
+
+        private SavedState(final Parcel in, final ClassLoader classLoader) {
+            super(in);
+            childrenStates_ = in.readSparseArray(classLoader);
+        }
+
+        @Override
+        public void writeToParcel(Parcel out, int flags) {
+            super.writeToParcel(out, flags);
+            out.writeSparseArray(childrenStates_);
+        }
+    }
+
+    @Override
+    protected Parcelable onSaveInstanceState() {
+        final Parcelable superState = super.onSaveInstanceState();
+        final SavedState savedState = new SavedState(superState);
+        savedState.childrenStates_ = new SparseArray();
+        int i = getChildCount();
+        while (i > 0) {
+            --i;
+            final View child = getChildAt(i);
+            child.saveHierarchyState(savedState.childrenStates_);
+        }
+        return savedState;
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Parcelable state) {
+        final SavedState savedState = (SavedState) state;
+        super.onRestoreInstanceState(savedState.getSuperState());
+        int i = getChildCount();
+        while (i > 0) {
+            --i;
+            final View child = getChildAt(i);
+            child.restoreHierarchyState(savedState.childrenStates_);
+        }
+    }
+
+    @Override
+    protected void dispatchSaveInstanceState(SparseArray<Parcelable> container) {
+        dispatchFreezeSelfOnly(container); // Manually saving children.
+    }
+
+    @Override
+    protected void dispatchRestoreInstanceState(SparseArray<Parcelable> container) {
+        dispatchThawSelfOnly(container); // Manually restoring children.
+    }
 
     public StackLight(Context context) {
         super(context);
@@ -155,10 +230,10 @@ public class StackLight extends LinearLayout {
     private void setBlinkPercent_(int blinkPercent) {
         blinkPercent_ = blinkPercent;
 
-        int n = getChildCount();
-        while (n > 0) {
-            --n;
-            final View child = getChildAt(n);
+        int i = getChildCount();
+        while (i > 0) {
+            --i;
+            final View child = getChildAt(i);
             setBlinkPercentChild(child, blinkPercent);
         }
     }

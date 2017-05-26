@@ -14,6 +14,8 @@ import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.IntDef;
@@ -36,7 +38,7 @@ import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 // Alternate way to implement would have been to use custom button states as follows:
 // http://stackoverflow.com/questions/4336060/how-to-add-a-custom-button-state
 
-public class Segment extends AppCompatImageView { // TODO: Change AppCompatImageView to AppCompatImageButton but without unwanted gaps.
+public class Segment extends AppCompatImageButton {
 
 /*
     private static final int[] LIGHT_OFF = {R.attr.light_off};
@@ -105,13 +107,76 @@ public class Segment extends AppCompatImageView { // TODO: Change AppCompatImage
         }
     };
 
+// TODO: https://stackoverflow.com/questions/3542333/how-to-prevent-custom-views-from-losing-state-across-screen-orientation-changes
+// TODO: http://trickyandroid.com/saving-android-view-state-correctly/
+
+    private static class SavedState extends BaseSavedState {
+        private boolean off_ = false;
+        private boolean on_ = false;
+
+        private static final Parcelable.Creator<SavedState> CREATOR =
+                new Parcelable.Creator<SavedState>() {
+                    public SavedState createFromParcel(Parcel in) {
+                        return new SavedState(in);
+                    }
+
+                    public SavedState[] newArray(int size) {
+                        return new SavedState[size];
+                    }
+                };
+
+        private SavedState(final Parcelable superState) {
+            super(superState);
+        }
+
+        private SavedState(final Parcel in) {
+            super(in);
+            // Use the same order as writeToParcel:
+            off_ = in.readInt()!=0;
+            on_ = in.readInt()!=0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel out, int flags) {
+            super.writeToParcel(out, flags);
+            // Use the same order as SavedState:
+            out.writeInt(off_ ? 1 : 0);
+            out.writeInt(on_ ? 1 : 0);
+        }
+
+        private void setOff(final boolean off) {
+            off_ = off;
+        }
+
+        private void setOn(final boolean on) {
+            on_ = on;
+        }
+    }
+
+    @Override
+    protected Parcelable onSaveInstanceState() {
+        final Parcelable superState = super.onSaveInstanceState();
+        final SavedState savedState = new SavedState(superState);
+        savedState.setOff(off_);
+        savedState.setOn(on_);
+        return savedState;
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Parcelable state) {
+        final SavedState savedState = (SavedState) state;
+        super.onRestoreInstanceState(savedState.getSuperState());
+        off_= savedState.off_;
+        on_= savedState.on_;
+    }
+
     public Segment(Context context) {
-        super(context);
+        super(context, null, R.style.stackLightSegment);
         init(context, null, 0, 0);
     }
 
     public Segment(Context context, AttributeSet attrs) {
-        super(context, attrs);
+        super(context, attrs, R.style.stackLightSegment);
         init(context, attrs, 0, 0);
     }
 
@@ -308,7 +373,6 @@ public class Segment extends AppCompatImageView { // TODO: Change AppCompatImage
     public void setOnOff(final boolean on) {
         off_ = !on;
         on_ = on;
-        refreshDrawableState();
         invalidate();
     }
 
