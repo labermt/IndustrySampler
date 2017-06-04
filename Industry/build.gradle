@@ -1,4 +1,35 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+
+// See: http://florentchampigny.com/publish-a-library-to-jcenter
+// ~/dev/IndustrySampler $ ./gradlew bintrayUpload # // Push artifact to bintray using the gradle task bintrayUpload.
+
+ext {
+    bintrayRepo = 'Industry' // The maven repo name (created on bintray)
+    bintrayName = 'Industry' // The name you want to give at your project on bintray
+    orgName = 'labermt' // user name
+
+    publishedGroupId = 'com.kea' // aaaa : The library group
+    artifact = 'Industry' // BBBB : The library name
+    libraryVersion = "0.0.0-alpha0" // The library version
+
+    // The library will be: aaaa:BBBB:version
+
+    libraryName = 'Industry'
+    libraryDescription = 'Android library of industrial control custom views.'
+
+    siteUrl = 'https://github.com/labermt/IndustrySampler'
+    gitUrl = 'https://github.com/labermt/IndustrySampler.git'
+
+    developerId = 'labermt'
+    developerName = 'Mitch Laber'
+    developerEmail = 'labermt@gmail.com'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
 
 android {
     compileSdkVersion 25
@@ -29,3 +60,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.3.1'
     testCompile 'junit:junit:4.12'
 }
+
+apply from: rootProject.file('gradle/install-v1.gradle')
+apply from: rootProject.file('gradle/bintray-android-v1.gradle')
