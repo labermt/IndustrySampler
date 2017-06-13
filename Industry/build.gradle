@@ -2,6 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 
+// See: http://blog.blundellapps.co.uk/locally-release-an-android-library-for-jcenter-or-maven-central-inclusion/
 // See: http://florentchampigny.com/publish-a-library-to-jcenter
 // ~/dev/IndustrySampler $ ./gradlew bintrayUpload # // Push artifact to bintray using the gradle task bintrayUpload.
 
@@ -15,6 +16,7 @@ ext {
     libraryVersion = "0.0.0-alpha0" // The library version
 
     // The library will be: aaaa:BBBB:version
+    // ex: // compile 'com.kea:Industry:0.0.0-alpha0'
 
     libraryName = 'Industry'
     libraryDescription = 'Android library of industrial control custom views.'
