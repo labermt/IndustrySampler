@@ -171,12 +171,12 @@ public class Segment extends AppCompatImageButton {
     }
 
     public Segment(Context context) {
-        super(context, null, R.style.stackLightSegment);
+        super(context, null, R.style.StackLightSegment);
         init(context, null, 0, 0);
     }
 
     public Segment(Context context, AttributeSet attrs) {
-        super(context, attrs, R.style.stackLightSegment);
+        super(context, attrs, R.style.StackLightSegment);
         init(context, attrs, 0, 0);
     }
 
