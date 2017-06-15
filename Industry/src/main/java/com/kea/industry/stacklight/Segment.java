@@ -196,10 +196,10 @@ public class Segment extends AppCompatImageButton {
     void init(final Context context, final AttributeSet attrs, final int defStyleAttr, final int defStyleRes) {
         @ColorInt int color = COLOR_BLACK;
 
+        int blinkDuration = BLINK_DURATION_PARENT;
+
         boolean off = false;
         boolean on = false;
-
-        int blinkDuration = BLINK_DURATION_PARENT;
 
         int radius = RADIUS_DEFAULT;
         int topLeftRadius = RADIUS_DEFAULT;
@@ -215,13 +215,13 @@ public class Segment extends AppCompatImageButton {
         try {
             color = a.getColor(R.styleable.StackLight_segment_color, color);
             blinkDuration = a.getInteger(R.styleable.StackLight_blink_duration, blinkDuration);
+            off = a.getBoolean(R.styleable.StackLight_light_off, off);
+            on = a.getBoolean(R.styleable.StackLight_light_on, on);
             radius = a.getDimensionPixelSize(R.styleable.StackLight_radius, radius);
             topLeftRadius = a.getDimensionPixelSize(R.styleable.StackLight_topLeftRadius, topLeftRadius);
             topRightRadius = a.getDimensionPixelSize(R.styleable.StackLight_topRightRadius, topRightRadius);
             bottomRightRadius = a.getDimensionPixelSize(R.styleable.StackLight_bottomRightRadius, bottomRightRadius);
             bottomLeftRadius = a.getDimensionPixelSize(R.styleable.StackLight_bottomLeftRadius, bottomLeftRadius);
-            off = a.getBoolean(R.styleable.StackLight_light_off, off);
-            on = a.getBoolean(R.styleable.StackLight_light_off, on);
         } finally {
             a.recycle();
         }

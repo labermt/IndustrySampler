@@ -34,9 +34,9 @@ TODO: Use dimens.xml to parameterize values.
             stacklight:topLeftRadius="@dimen/stack_light_segment_corner_radius"
             stacklight:topRightRadius="@dimen/stack_light_segment_corner_radius"
             stacklight:segment_color="@color/red"
-            stacklight:light_off="false"
-            stacklight:light_on="false"
-            stacklight:blink_duration="300" />
+            stacklight:light_off="true"
+            stacklight:light_on="true"
+            stacklight:blink_duration="333" />
 
         <com.kea.industry.stacklight.Segment
             android:id="@+id/stack_light_segment_amber"
@@ -44,7 +44,7 @@ TODO: Use dimens.xml to parameterize values.
             android:layout_height="wrap_content"
             stacklight:segment_color="@color/amber"
             stacklight:light_off="false"
-            stacklight:light_on="false"
+            stacklight:light_on="true"
             stacklight:blink_duration="1000" />
 
         <com.kea.industry.stacklight.Segment
@@ -52,8 +52,8 @@ TODO: Use dimens.xml to parameterize values.
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             stacklight:segment_color="@color/green"
-            stacklight:light_off="false"
-            stacklight:light_on="true" />
+            stacklight:light_off="true"
+            stacklight:light_on="false" />
 
         <com.kea.industry.stacklight.Segment
             android:id="@+id/stack_light_segment_blue"
@@ -65,9 +65,7 @@ TODO: Use dimens.xml to parameterize values.
             android:id="@+id/stack_light_segment_white"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            stacklight:segment_color="@color/silver"
-            stacklight:light_off="true"
-            stacklight:light_on="true" />
+            stacklight:segment_color="@color/silver" />
 
     </com.kea.industry.stacklight.StackLight>
 

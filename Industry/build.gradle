@@ -13,7 +13,7 @@ ext {
 
     publishedGroupId = 'com.kea' // aaaa : The library group
     artifact = 'Industry' // BBBB : The library name
-    libraryVersion = "0.0.0-alpha0" // The library version
+    libraryVersion = "0.0.0-alpha1" // The library version
 
     // The library will be: aaaa:BBBB:version
     // ex: // compile 'com.kea:Industry:0.0.0-alpha0'
