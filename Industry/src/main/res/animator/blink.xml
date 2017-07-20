@@ -4,11 +4,6 @@
     android:ordering="sequentially"
     >
 
-<!--
-TODO: Is there an easier way to deal with objectAnimator durations?
-    see: StackLightSegment.java BLINK_XML_OBJECT_ANIMATOR_SPLIT
--->
-
 <!--Turn off light and then on.-->
     <objectAnimator
         android:interpolator="@android:anim/accelerate_interpolator"

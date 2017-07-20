@@ -5,6 +5,7 @@ import android.animation.AnimatorInflater;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.content.Context;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -30,6 +31,7 @@ import android.widget.LinearLayout;
 
 import static android.graphics.Color.argb;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+import static com.kea.industry.stacklight.R.attr.theme;
 
 /**
  * Created by bessermt on 4/6/17.
@@ -207,7 +209,7 @@ public class Segment extends AppCompatImageButton {
         int bottomRightRadius = RADIUS_DEFAULT;
         int bottomLeftRadius = RADIUS_DEFAULT;
 
-        TypedArray a = context.getTheme().obtainStyledAttributes(
+        final TypedArray a = context.getTheme().obtainStyledAttributes(
                 attrs,
                 R.styleable.StackLight,
                 0, 0);

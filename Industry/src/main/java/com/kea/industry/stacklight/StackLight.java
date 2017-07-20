@@ -5,6 +5,7 @@ import android.animation.AnimatorInflater;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.content.Context;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.os.Handler;
 import android.os.Looper;
@@ -29,6 +30,7 @@ public class StackLight extends LinearLayout {
     private static final int COLOR_RESID_DEFAULT = R.color.default_stack_light_color;
     static final int BLINK_DURATION_DEFAULT = 1000; // millisecs
 
+// <!-- TODO: Is there an easier way to deal with objectAnimator durations? -->
     // Break animation duration into delay and active time.
     // ex. 2=half animated, half delay, 3=third animated, 2 thirds delay.
     static final int BLINK_XML_OBJECT_ANIMATOR_DENOM = 2;
@@ -180,11 +182,13 @@ public class StackLight extends LinearLayout {
         setStackOrientation(orientation);
 
         // TODO: try/catch
-        blinkAnimatorSet_ = (AnimatorSet) AnimatorInflater.loadAnimator(context, R.animator.blink);
-
-        setBlinkDuration(blinkDuration);
-        blinkAnimatorSet_.addListener(animatorListenerAdapter_);
-        blinkAnimatorSet_.setTarget(this);
+        try {
+            blinkAnimatorSet_ = (AnimatorSet) AnimatorInflater.loadAnimator(context, R.animator.blink);
+        } finally {
+            setBlinkDuration(blinkDuration);
+            blinkAnimatorSet_.addListener(animatorListenerAdapter_);
+            blinkAnimatorSet_.setTarget(this);
+        }
     }
 
     private void setStackOrientation(final @LinearLayoutCompat.OrientationMode int orientation) {
